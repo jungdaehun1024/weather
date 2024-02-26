@@ -19,10 +19,10 @@
           <p>{{currentTemp}}&deg;</p>  <!-- &deg :	Degree sign-->
         </div>
         <div class="weatherIcon">
-          <img src="@/assets/images/04d.png" alt="MainLogo">
+          <img src="images[0]" alt="MainLogo">
         </div>
         <div class="weatherData">
-          <div v-for="temporary in temporartData" :key="temporary.title" class="detailData">
+          <div v-for="temporary in temporaryData" :key="temporary.title" class="detailData">
           <p>{{ temporary.title }}</p>
           <p>{{ temporary.value }}</p>
         </div>
@@ -63,99 +63,73 @@
   <SubView/>
 </template>
 
-<script setup>
+ <script setup>
+
+import store from '@/store';
 import SubView from './SubView.vue';
 import axios from "axios";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
+
 dayjs.locale("ko")  // global로 한국어 locale 사용한다.
-// const API_KEY="c12b4d7e30c2e759a3caea44f155650c";
-// let initalLat=37.566826;
-// let initalLon =126.9778;
-// const WAETHER_URL = `https://api.openweathermap.org/data/3.0/onecall?lat=${initalLat}&lon=${initalLon}&appid=${API_KEY}&units=metric`;
+// 현재 시간을 나타내기 위한 Dayjs 플러그인 사용 
 
- //임시 데이터 
- const temporartData = [
-    {
-    title: "습도",
-    value: ""
-   },
-   {
-    title: "풍속",
-    value: ""
-   },
-   {
-    title: "체감온도",
-    value: ""
-   }
-  ]
-
-const store = useStore();
-
-const fetchWeatherData = async ()=>{
-  await store.dispatch('openWeatherApi/FETCH_OPENWEATHER_API');
-}
+const arrayIcons= ref([]);
+onMounted(async()=>{
+   const store = useStore();
+   await store.dispatch("openWeatherApi/FETCH_OPENWEATHER_API");
+  //  const {currentTemp:temp, currentHumidity, currentWindSpeed, currentFeelsLike} = store.state.openWeatherApi.currentWeather
+  //  currentTemp.value = temp;
+})
 
 
-const {currentHumidity,currentWindSpeed,currentFeelsLike} = store.state.openWeatherApi.currentWeather;
-// //현재 시간에 따른 현재 온도 데이터 
+//computed에 선언된 것은 함수가 아니며 
+//state에 선언된 데이터와는 전혀 다른 값이다?
+//computed자체는 이것이 선언된 컴포넌트에서 사용할 목적으로 만든 데이터이기 때문 
+
+//마커 선택시 레이아웃에 보여지는 도시 이름 
+const cityName = computed(()=>{
+  return store.state.openWeatherApi.cityName;// 기본값 seoul
+})
+
+//현재 시간에 따른 온도 데이터 
 const currentTemp = computed(()=>{
-  const {currentTemp} = store.state.openWeatherApi.currentWeather;
+  const{currentTemp} = store.state.openWeatherApi.currentWeather;
   return currentTemp;
 })
 
-temporartData[0].value = currentHumidity + "%";
-temporartData[1].value = currentWindSpeed + "m/s";
-temporartData[2].value = Math.round(currentFeelsLike)+ "도";
-arrayTemps = store.state.openWeatherApi.hourlyWeather;
+const arrayTemps = computed(()=>{
+  return store.state.openWeatherApi.hourlyWeather;
+})
+
+const temporaryData = computed(()=>{
+  const {currentHumidity,currentWindSpeed,currentFeelsLike} = store.state.openWeatherApi.currentWeather;
+
+  return [
+  {
+    title:"습도",
+    value:currentHumidity+"%",
+  },
+  {
+    title:"풍속",
+    value:currentWindSpeed+"m/s",
+  },
+  {
+    title:"체감온도",
+    value:currentFeelsLike+"도",
+  }
+  ]
+})
+
+const images = computed(()=>{
+  return store.state.openWeatherApi.images;
+})
+
+console.log(images.value);
 
 
-
-// axios
-//   .get(WAETHER_URL)
-//   .then(response =>{
-//     // console.log(response);
-
-//     //지역
-//     let initalCityName = response.data.timezone;
-
-//     //현재 정보들
-//     let initalCurrentWeatherData = response.data.current;
-
-//     //현재 기온 
-//     let initalCurrentTemp =initalCurrentWeatherData.temp;
-
-//     //[Asia/Seoul] 문자열 분리 
-//     cityName.value = initalCityName.split("/")[1];
-//     currentTemp.value = Math.round(initalCurrentTemp); // 현재 시간에 따른 온도 
-//     temporartData[0].value = initalCurrentWeatherData.humidity +"%";//습도
-//     temporartData[1].value = initalCurrentWeatherData.wind_speed +"m/s" //풍속
-//     temporartData[2].value = Math.floor(initalCurrentWeatherData.feels_like) +"도"// 체감온도
-
-//    arrayTemps = response.data.hourly;
-//     //24시간 이내 데이터만 사용할 것이기 때문에 for 활용 
-//     for(let i=0; i<24;i++){
-//       //시간대별 날씨 데이터 
-//       arrayTemps[i] = response.data.hourly[i];
-//     }
-//     // console.log(arrayTemps);
-//   })
-//   .catch(error =>{
-//     console.log(error)
-//   })
-
-
-
-
-// 현재 시간을 나타내기 위한 Dayjs 플러그인 사용 
-const currentTime = ref(dayjs().format("YYYY. MM. DD .ddd"));
-let cityName = ref("");
-
-
-
- 
 
   //초단위로 표현되는 UnixTimestamp를 밀리초단위로 변환해 '시간'정보를 얻는다.
   function unix_timestamp(dt){
@@ -164,7 +138,8 @@ let cityName = ref("");
       return hour.substring(hour.length-2)+"시"
   }
 
-</script>
+</script> 
+
 
 <style lang="scss" scoped>
 
