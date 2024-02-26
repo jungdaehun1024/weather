@@ -1,0 +1,57 @@
+//google font(NotoSansKR)
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap');
+
+
+//google font(Poppins)
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+//google font(Be vietnam pro)
+
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Noto+Sans+KR&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+
+
+//어떤 레이아웃이 중앙에 위치할 수 있도록 하기 위한 함수 
+@mixin center(){
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin center-sb(){
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin center-se(){
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+
+// 'c-' 는 flex-direction이 column인 속성이 추가된 메서드 
+@mixin c-center(){
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+@mixin c-center-sb(){
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+@mixin c-center-se(){
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-direction: column;
+}
+
+//실무에서 Scss로 스타일링(= 퍼블리싱)을 진행할 때
+// mixin을통해 코드를 재활용할 숭 ㅣㅆ다.
