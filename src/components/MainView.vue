@@ -61,14 +61,12 @@
     </nav>
   </div>
   <SubView/>
-  <img :src="images[31]">
 </template>
 
  <script setup>
 
 import store from '@/store';
 import SubView from './SubView.vue';
-import axios from "axios";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import { computed, onMounted, ref } from 'vue';
@@ -128,7 +126,7 @@ const images = computed(()=>{
   return store.state.openWeatherApi.images;
 })
 
-console.log(images.value);
+
   //초단위로 표현되는 UnixTimestamp를 밀리초단위로 변환해 '시간'정보를 얻는다.
   function unix_timestamp(dt){
     let date = new Date(dt * 1000);

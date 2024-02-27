@@ -3,6 +3,11 @@ import axios from "axios";
 export default{
    namespaced: true,
    state:{
+    position:{
+      //디폴트 값으로 서울 좌표를 넣어줌
+      lat:37.5683,
+      lon:126.9778,
+    },
     cityName:"Seoul",
     currentWeather:{
       //main.vue에서 사용
@@ -21,6 +26,13 @@ export default{
    },
    getters:{},
    mutations:{
+     //좌표에 대한 mutation
+     SET_LATLON(state,payload){
+      //payload로 받는 Ma는 lat으로 La는 lon으로 할당
+       state.position.lat = payload.Ma;
+       state.position.lon = payload.La;
+     },
+
       SET_CITYNAME(state, payload) {
         state.cityName = payload;
       },
@@ -43,8 +55,8 @@ export default{
 
    actions:{
     async FETCH_OPENWEATHER_API(context){
-      let initalLat=37.566826;
-      let initalLon =126.9778;
+      let initalLat=context.state.position.lat;
+      let initalLon =context.state.position.lon
       const API_KEY="c12b4d7e30c2e759a3caea44f155650c";
       //}&units=metric: 섭씨로 표현해주기위함 
       const WAETHER_URL = `https://api.openweathermap.org/data/3.0/onecall?lat=${initalLat}&lon=${initalLon}&appid=${API_KEY}&units=metric`;
@@ -54,9 +66,10 @@ export default{
         const images = new Array();
         for(let i = 0; i<48 ; i++){
           const weatherIcon = res.data.hourly[i].weather[0].icon;
-          images[i] = `src/assets/images/${weatherIcon}.png`;
+          images[i] = require(`@/assets/images/${weatherIcon}.png`);
         }
 
+        
         //actions에서 mutaions사용할 때는 commit사용한다.
         context.commit("SET_IMAGEPATH",images);
         context.commit('SET_CURRENT_WEATHER', res.data.current); // 조회하는 현재시간에 대한 날씨데이터

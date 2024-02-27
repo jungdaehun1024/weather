@@ -50,70 +50,97 @@
 
 <script setup>
   import Map from './Map.vue';
-  import { ref } from 'vue';
+  import { computed, onMounted, ref, watchEffect } from 'vue';
   import dayjs, { unix } from "dayjs";
- import "dayjs/locale/ko";
-import axios from 'axios';
+  import "dayjs/locale/ko";
+  import { useStore } from 'vuex';
   dayjs.locale("ko")  // global로 한국어 locale 사용한다.
 
 //현재 시간을 나타내기 위한 Dayjs 플러그인 사용 
 let currentTime = ref(dayjs().format("YYYY. MM. DD .ddd"));
+
 let cityName = ref("");// 도시 이름
 let feeling = ref("");// 체감온도 
 let subWeatherData = ref([]);
 
-const fetchOpenWeatherApi = ()=>{
-   let initalLat=37.566826;
-   let initalLon =126.9778;
-   const API_KEY="c12b4d7e30c2e759a3caea44f155650c";
-   const WAETHER_URL = `https://api.openweathermap.org/data/3.0/onecall?lat=${initalLat}&lon=${initalLon}&appid=${API_KEY}&units=metric`;
-   axios
-   .get(WAETHER_URL)
-   .then(response=>{
-    // console.log(response);
-    let isInitalData = response.data.current; //초기데이터 
-    let isInitalCityName = response.data.timezone;//초기 도시이름 데이터 
-    let isFeelLikeTemp = isInitalData.feels_like; // 초기 체감온도 데이터 
-    let isTimeOfSunrise = isInitalData.sunrise;// 일출시간 데이터 
-    let isTimeOfSunset = isInitalData.sunset; //일몰시간 데이터 
-    let isLineOfSight = isInitalData.visibility // 가시거리 데이터 
-
-    //데이터 사전처리
-    //unix_timestamp함수를 사용한 시간 처리 
-    let isProcessedData = [
-      {name:"일출시간",value:unix_timestamp(isTimeOfSunrise)},
-      {name:"일몰시간",value:unix_timestamp(isTimeOfSunset)},
-      
-      //정규표현식을 사용한 3자리마다 쉼표찍기
-      {name:"가시거리",value:isLineOfSight.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "M",}
-
-    ];
-
- 
-    const tempPoints = [0,10,15,20,25,30];//breakPoint값들이 들어있는 배열 
-    const lavels = ["매우 추움","추움","씰쌀함","선선함","보통","더움","매우 더움"] // 체감온도를 표시해주는 텍스트가 담긴 배열 
-    let index = 0;// 인덱스 
-    for(const point of tempPoints ){
-      if(isFeelLikeTemp <= point) break;
-      index ++
-    }
-    feeling.value = lavels[index];
-
-    cityName.value = isInitalCityName.split("/")[1];
-    subWeatherData.value = isProcessedData;
-   })
-   .catch(error=>{
-    console.log(error);
-   })
-}
-
+//타임스탬프로 변환
 const unix_timestamp =(dt)=>{
  let date = new Date(dt * 1000);
  let hour = "0"+date.getHours()
  return hour.substring(hour.length-2)+"시";
 }
 
-fetchOpenWeatherApi();
+const store = useStore();
+
+const fetchOpenWeatherApi = async()=>{
+  //API호출을 위한 필수 데이터 
+  try{
+    await store.dispatch("openWeatherApi/FETCH_OPENWEATHER_API");
+    const { currentFeelsLike, currentSunrise, currentSunset, currentVisibility} = store.state.openWeatherApi.currentWeather;
+    let isInitalCityName = store.state.openWeatherApi.cityName; // 초기 도시 이름 데이터 
+
+    //초기 체감온도 데이터 
+    let isFeelLikeTemp = computed(()=>{
+      return currentFeelsLike;
+    })
+    
+    //일출시간 데이터
+    let isTimeOfSunrise = computed(()=>{
+      return currentSunrise;
+    })
+
+    //일몰시간 데이터
+    let isTimeOfSunSet = computed(()=>{
+      return currentSunset;
+    })
+
+    //가시거리 데이터 
+    let isLineOfSight = computed(()=>{
+      return currentVisibility;
+    })
+
+
+
+    const tempPoints = [0,10,15,20,25,30];//breakPoint값들이 들어있는 배열 
+    const lavels = ["매우 추움","추움","씰쌀함","선선함","보통","더움","매우 더움"] // 체감온도를 표시해주는 텍스트가 담긴 배열 
+    let index = 0;// 인덱스 
+    for(const point of tempPoints ){
+      if(isFeelLikeTemp.value <= point) break;
+      index ++
+    }
+    feeling.value = lavels[index];
+
+    //가공한 데이터로 새로운 배열 생성 
+    let isProcessedData = [
+      {name:"일출시간",value:unix_timestamp(isTimeOfSunrise.value)},
+      {name:"일몰시간",value:unix_timestamp(isTimeOfSunSet.value)},
+      
+      //정규표현식을 사용한 3자리마다 쉼표찍기
+      {name:"가시거리",value:isLineOfSight.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "M",}
+    ];
+
+    //Composition Api에서 Ajax 요청과 데이터 변경을 하려면 .value로 접근해야한다.
+    cityName.value = isInitalCityName;
+    subWeatherData.value = isProcessedData;
+
+
+  }catch(error){
+    console.log(error);
+  }
+};
+
+watchEffect(async ()=>{
+  await fetchOpenWeatherApi();
+});
+
+onMounted(()=>{
+  fetchOpenWeatherApi();
+})
+
+
+
+
+
 
 </script>
 
