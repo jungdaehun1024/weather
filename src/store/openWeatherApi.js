@@ -42,7 +42,6 @@ export default{
    },
 
    actions:{
-
     async FETCH_OPENWEATHER_API(context){
       let initalLat=37.566826;
       let initalLon =126.9778;
@@ -58,6 +57,7 @@ export default{
           images[i] = `src/assets/images/${weatherIcon}.png`;
         }
 
+        //actions에서 mutaions사용할 때는 commit사용한다.
         context.commit("SET_IMAGEPATH",images);
         context.commit('SET_CURRENT_WEATHER', res.data.current); // 조회하는 현재시간에 대한 날씨데이터
         context.commit('SET_TIMELY_WEATHER', res.data.hourly);

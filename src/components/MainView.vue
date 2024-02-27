@@ -19,7 +19,7 @@
           <p>{{currentTemp}}&deg;</p>  <!-- &deg :	Degree sign-->
         </div>
         <div class="weatherIcon">
-          <img src="images[0]" alt="MainLogo">
+          <img :src="images[0]" alt="MainLogo">
         </div>
         <div class="weatherData">
           <div v-for="temporary in temporaryData" :key="temporary.title" class="detailData">
@@ -37,7 +37,7 @@
       <div class="timelyWeatherBox">
         <div class="timelyWeather" v-for="(temp,index) in arrayTemps" :key="index">
           <div class="icon">
-            <img src="@/assets/images/03d.png" alt="">
+            <img :src="images[index]" alt="">
           </div>
           <div class="data">
             <p class="time">{{ unix_timestamp(temp.dt) }}</p>
@@ -52,7 +52,7 @@
       </div>
 
     </div>
-    
+
     <nav>
       <i class="fas fa-home"></i>
       <i class="fas fa-search-location"></i>
@@ -61,6 +61,7 @@
     </nav>
   </div>
   <SubView/>
+  <img :src="images[31]">
 </template>
 
  <script setup>
@@ -75,7 +76,7 @@ import { useStore } from 'vuex';
 
 dayjs.locale("ko")  // global로 한국어 locale 사용한다.
 // 현재 시간을 나타내기 위한 Dayjs 플러그인 사용 
-
+const currentTime = ref(dayjs().format("YYYY. MM. DD .ddd"));
 const arrayIcons= ref([]);
 onMounted(async()=>{
    const store = useStore();
@@ -128,15 +129,13 @@ const images = computed(()=>{
 })
 
 console.log(images.value);
-
-
-
   //초단위로 표현되는 UnixTimestamp를 밀리초단위로 변환해 '시간'정보를 얻는다.
   function unix_timestamp(dt){
     let date = new Date(dt * 1000);
     let hour = "0" + date.getHours();
       return hour.substring(hour.length-2)+"시"
   }
+ 
 
 </script> 
 
