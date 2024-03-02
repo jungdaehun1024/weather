@@ -73,14 +73,14 @@ import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 
 dayjs.locale("ko")  // global로 한국어 locale 사용한다.
+
 // 현재 시간을 나타내기 위한 Dayjs 플러그인 사용 
 const currentTime = ref(dayjs().format("YYYY. MM. DD .ddd"));
-const arrayIcons= ref([]);
+
 onMounted(async()=>{
-   const store = useStore();
+  const store = useStore();
    await store.dispatch("openWeatherApi/FETCH_OPENWEATHER_API");
-  //  const {currentTemp:temp, currentHumidity, currentWindSpeed, currentFeelsLike} = store.state.openWeatherApi.currentWeather
-  //  currentTemp.value = temp;
+
 })
 
 
@@ -333,6 +333,9 @@ const images = computed(()=>{
       height: 65%;
       padding: 0 30px;
       overflow: scroll;
+
+      
+  
       .timelyWeather{
         display: flex;
         width:126px;

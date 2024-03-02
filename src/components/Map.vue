@@ -31,7 +31,6 @@ onMounted(()=>{
 //지도를 초기화하는 함수 
 function initMap(){
 
-
   //mapContainer: 지도가 표시될 HTML element
   const mapContainer = document.getElementById('map'); // 지도를 표시할 div
  
@@ -44,15 +43,24 @@ function initMap(){
   //지도 생성
   const map = new kakao.maps.Map(mapContainer, mapOption);
 
+  //각각의 지역정보를 pos로 할당해 객체로 할당
   const positions = MapPositions.map((pos)=>({
+    //kakao.maps.LatLng(latitude, longitude): 좌표 정보를 가지고 있는 객체를 생성한다.
+    //전개연산자로 위도와 경도(lat과 lng)을 각각의 요소로 분리해 
+    //인자로 전달해 좌표정보를 가진 객체를 반환
     latlng: new kakao.maps.LatLng(...pos.latlng),
+
+    //도시이름
     cityName: pos.cityName,
   }));
+
+
 
 //마커를 생성한다.
 //마커가 클릭된 직후 Vuex stroe로 즉각적으로 좌표값이 변경되면서 뮤테이션이 돌고 난 후 
 //api를 dispatch로 다시한번 호출해줌으로 나머지 날씨데이터의 변경을 유도
 positions.forEach((pos)=>{
+
   const marker = new kakao.maps.Marker({
     position: pos.latlng, // 마커의 위치
   });
@@ -62,7 +70,6 @@ positions.forEach((pos)=>{
 
   //클릭된 마커의 좌표를 vuex store에 전달하는 작업을 할 것 
   //마커를 클릭을 부여하는 코드 
-  
   kakao.maps.event.addListener(marker,"click",()=>{
      //클릭한 위도 경도 정보를 불러온다.
      //watch로 따로 빼지않고 직접 vuexStore에 전달
