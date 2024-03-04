@@ -1,14 +1,20 @@
 import axios from "axios";
 
 export default{
-   namespaced: true,
+
+   //Vuex스토어 모듈의 네임스페싱 여부를 나타낸다/
+   namespaced: true, // 해당 모듈은 자체 네임스페이스를 공유하게된다.
+
+   //vue.js의 Data와 유사한 기능을 가진다.
    state:{
     position:{
       //디폴트 값으로 서울 좌표를 넣어줌
       lat:37.5683,
       lon:126.9778,
     },
+    //도시이름
     cityName:"Seoul",
+    //현재날씨
     currentWeather:{
       //main.vue에서 사용
       currentTemp:0,
@@ -21,7 +27,9 @@ export default{
       currentSunset:0,
       currentVisibility: 0,
     },
+    //시간대별 날씨 데이터
     hourlyWeather:[],
+    //이미지 데이터
     images:[],
    },
    getters:{},
@@ -33,9 +41,12 @@ export default{
        state.position.lon = payload.La;
      },
 
+      //도시이름
       SET_CITYNAME(state, payload) {
         state.cityName = payload;
       },
+
+      //현재 날씨 데이터 
       SET_CURRENT_WEATHER(state, payload) {
           state.currentWeather.currentTemp = Math.round(payload.temp); // 현재온도
           state.currentWeather.currentHumidity = payload.humidity; // 습도
@@ -45,6 +56,8 @@ export default{
           state.currentWeather.currentSunset = payload.sunset; // 일몰시간
           state.currentWeather.currentVisibility = payload.visibility; // 가시거리
       },
+
+      //시간별 날씨 데이터
       SET_TIMELY_WEATHER(state, payload) {
           state.hourlyWeather = payload;
       },
@@ -66,6 +79,7 @@ export default{
         const images = new Array();
         for(let i = 0; i<48 ; i++){
           const weatherIcon = res.data.hourly[i].weather[0].icon;
+          //JS내에서 파일을 동적으로 로드할 때 require를 사용한다.
           images[i] = require(`@/assets/images/${weatherIcon}.png`);
         }
 

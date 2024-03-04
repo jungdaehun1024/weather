@@ -65,7 +65,7 @@
 
  <script setup>
 
-import store from '@/store';
+
 import SubView from './SubView.vue';
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
@@ -76,17 +76,12 @@ dayjs.locale("ko")  // global로 한국어 locale 사용한다.
 
 // 현재 시간을 나타내기 위한 Dayjs 플러그인 사용 
 const currentTime = ref(dayjs().format("YYYY. MM. DD .ddd"));
-
+const store = useStore();
 onMounted(async()=>{
   const store = useStore();
    await store.dispatch("openWeatherApi/FETCH_OPENWEATHER_API");
 
 })
-
-
-//computed에 선언된 것은 함수가 아니며 
-//state에 선언된 데이터와는 전혀 다른 값이다?
-//computed자체는 이것이 선언된 컴포넌트에서 사용할 목적으로 만든 데이터이기 때문 
 
 //마커 선택시 레이아웃에 보여지는 도시 이름 
 const cityName = computed(()=>{
@@ -121,11 +116,9 @@ const temporaryData = computed(()=>{
   }
   ]
 })
-
 const images = computed(()=>{
   return store.state.openWeatherApi.images;
 })
-
 
   //초단위로 표현되는 UnixTimestamp를 밀리초단위로 변환해 '시간'정보를 얻는다.
   function unix_timestamp(dt){
@@ -133,10 +126,7 @@ const images = computed(()=>{
     let hour = "0" + date.getHours();
       return hour.substring(hour.length-2)+"시"
   }
- 
-
 </script> 
-
 
 <style lang="scss" scoped>
 

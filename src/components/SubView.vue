@@ -118,30 +118,16 @@ const fetchOpenWeatherApi = async()=>{
       //정규표현식을 사용한 3자리마다 쉼표찍기
       {name:"가시거리",value:isLineOfSight.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "M",}
     ];
-
-    //Composition Api에서 Ajax 요청과 데이터 변경을 하려면 .value로 접근해야한다.
     cityName.value = isInitalCityName;
     subWeatherData.value = isProcessedData;
-
-
   }catch(error){
     console.log(error);
   }
 };
 
-watchEffect(async ()=>{
-  await fetchOpenWeatherApi();
-});
-
 onMounted(()=>{
   fetchOpenWeatherApi();
 })
-
-
-
-
-
-
 </script>
 
 <style lang="scss" scoped>
